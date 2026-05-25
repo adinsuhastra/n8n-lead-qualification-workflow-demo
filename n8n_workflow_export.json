@@ -1,0 +1,280 @@
+{
+  "name": "Demo - Lead Qualification With Human Approval",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger-demo",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "json": [
+            {
+              "name": "leads",
+              "value": [
+                {
+                  "leadId": "DEMO-001",
+                  "company": "Northstar Studio",
+                  "contactName": "Maya",
+                  "email": "maya@northstar.example",
+                  "requestedService": "Landing page cleanup and lead form routing",
+                  "budget": 1200,
+                  "urgency": "high",
+                  "businessFit": "strong",
+                  "source": "Demo form",
+                  "consentToContact": true
+                },
+                {
+                  "leadId": "DEMO-002",
+                  "company": "Cedar Books",
+                  "contactName": "Rafi",
+                  "email": "rafi@cedarbooks.example",
+                  "requestedService": "Spreadsheet cleanup and supplier list formatting",
+                  "budget": 350,
+                  "urgency": "medium",
+                  "businessFit": "strong",
+                  "source": "Demo CSV",
+                  "consentToContact": true
+                },
+                {
+                  "leadId": "DEMO-003",
+                  "company": "Blue Harbor Cafe",
+                  "contactName": "Lina",
+                  "email": "",
+                  "requestedService": "Booking automation planning",
+                  "budget": 450,
+                  "urgency": "low",
+                  "businessFit": "medium",
+                  "source": "Manual demo entry",
+                  "consentToContact": true
+                },
+                {
+                  "leadId": "DEMO-004",
+                  "company": "Green Desk Admin",
+                  "contactName": "Sari",
+                  "email": "sari@greendesk.example",
+                  "requestedService": "Research list formatting",
+                  "budget": 220,
+                  "urgency": "medium",
+                  "businessFit": "low",
+                  "source": "Demo CSV",
+                  "consentToContact": false
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "id": "load-demo-leads",
+      "name": "Load Fictional Sample Leads",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ],
+      "notes": "Demo-only sample data. No real personal data."
+    },
+    {
+      "parameters": {
+        "jsCode": "const leads = $json.leads || [];\n\nfunction validateLead(lead) {\n  const missing = [];\n  if (!lead.company) missing.push('company');\n  if (!lead.contactName) missing.push('contactName');\n  if (!lead.email) missing.push('email');\n  if (!lead.requestedService) missing.push('requestedService');\n  if (!lead.consentToContact) missing.push('contact consent');\n  return { valid: missing.length === 0, missing };\n}\n\nfunction scoreLead(lead) {\n  const validation = validateLead(lead);\n  if (!validation.valid) {\n    return {\n      ...lead,\n      score: 0,\n      category: 'Needs Review',\n      validationStatus: validation.missing.join(', '),\n      recommendedNextAction: 'Do not contact until reviewed by a human.'\n    };\n  }\n\n  let score = 20;\n  score += lead.budget >= 1000 ? 30 : lead.budget >= 500 ? 20 : 8;\n  score += lead.urgency === 'high' ? 25 : lead.urgency === 'medium' ? 15 : 5;\n  score += lead.businessFit === 'strong' ? 25 : lead.businessFit === 'medium' ? 15 : 5;\n\n  const category = score >= 75 ? 'Hot' : score >= 50 ? 'Warm' : 'Cold';\n\n  return {\n    ...lead,\n    score,\n    category,\n    validationStatus: 'complete',\n    recommendedNextAction: category === 'Hot'\n      ? 'Human review, then consider follow-up.'\n      : category === 'Warm'\n        ? 'Review scope and budget before follow-up.'\n        : 'Hold unless more details are provided.'\n  };\n}\n\nreturn leads.map(lead => ({ json: scoreLead(lead) }));"
+      },
+      "id": "validate-and-score-leads",
+      "name": "Validate And Score Leads",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        540,
+        0
+      ],
+      "notes": "Rule-based demo scoring. No external API calls."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.category}}",
+              "operation": "equal",
+              "value2": "Hot"
+            }
+          ]
+        }
+      },
+      "id": "route-hot-leads",
+      "name": "Is Hot Lead?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        820,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "followUpDraft",
+              "value": "=Hi {{$json.contactName}}, thanks for sharing the request for {{$json.company}}. Based on the details, a good next step would be a short review of the current workflow for: {{$json.requestedService}}. I can start with a small scoped review and send a clear plan before anything is changed."
+            },
+            {
+              "name": "approvalStatus",
+              "value": "waiting_for_human_review"
+            }
+          ]
+        }
+      },
+      "id": "prepare-follow-up-draft",
+      "name": "Prepare Follow-Up Draft",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1080,
+        -120
+      ],
+      "notes": "Draft only. Do not send automatically."
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "approvalCheckpoint",
+              "value": "Human approval required before any outreach or client-facing action."
+            },
+            {
+              "name": "reportingNote",
+              "value": "=Lead {{$json.leadId}} is categorized as {{$json.category}} with score {{$json.score}}."
+            }
+          ]
+        }
+      },
+      "id": "human-approval-and-report",
+      "name": "Human Approval And Report",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        -120
+      ],
+      "notes": "This node represents a manual approval gate. A real workflow should use an approval tool, queue, or review step before sending anything."
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "approvalStatus",
+              "value": "blocked_or_hold"
+            },
+            {
+              "name": "reportingNote",
+              "value": "=Lead {{$json.leadId}} is {{$json.category}}. Recommended action: {{$json.recommendedNextAction}}"
+            }
+          ]
+        }
+      },
+      "id": "hold-non-hot-leads",
+      "name": "Hold Or Review Non-Hot Leads",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1080,
+        140
+      ],
+      "notes": "Warm, Cold, and Needs Review leads are not sent to outreach automatically."
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Load Fictional Sample Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Fictional Sample Leads": {
+      "main": [
+        [
+          {
+            "node": "Validate And Score Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate And Score Leads": {
+      "main": [
+        [
+          {
+            "node": "Is Hot Lead?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Hot Lead?": {
+      "main": [
+        [
+          {
+            "node": "Prepare Follow-Up Draft",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Hold Or Review Non-Hot Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Follow-Up Draft": {
+      "main": [
+        [
+          {
+            "node": "Human Approval And Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "description": "Safe demo-only workflow. No credentials, no external APIs, no automated outreach."
+  },
+  "pinData": {},
+  "versionId": "demo-local-only",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "name": "portfolio-demo"
+    },
+    {
+      "name": "human-approval"
+    }
+  ]
+}

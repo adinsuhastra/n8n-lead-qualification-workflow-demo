@@ -1,0 +1,54 @@
+{
+  "demo": "n8n Lead Qualification Workflow Demo",
+  "contains_real_personal_data": false,
+  "leads": [
+    {
+      "leadId": "DEMO-001",
+      "company": "Northstar Studio",
+      "contactName": "Maya",
+      "email": "maya@northstar.example",
+      "requestedService": "Landing page cleanup and lead form routing",
+      "budget": 1200,
+      "urgency": "high",
+      "businessFit": "strong",
+      "source": "Demo form",
+      "consentToContact": true
+    },
+    {
+      "leadId": "DEMO-002",
+      "company": "Cedar Books",
+      "contactName": "Rafi",
+      "email": "rafi@cedarbooks.example",
+      "requestedService": "Spreadsheet cleanup and supplier list formatting",
+      "budget": 350,
+      "urgency": "medium",
+      "businessFit": "strong",
+      "source": "Demo CSV",
+      "consentToContact": true
+    },
+    {
+      "leadId": "DEMO-003",
+      "company": "Blue Harbor Cafe",
+      "contactName": "Lina",
+      "email": "",
+      "requestedService": "Booking automation planning",
+      "budget": 450,
+      "urgency": "low",
+      "businessFit": "medium",
+      "source": "Manual demo entry",
+      "consentToContact": true
+    },
+    {
+      "leadId": "DEMO-004",
+      "company": "Green Desk Admin",
+      "contactName": "Sari",
+      "email": "sari@greendesk.example",
+      "requestedService": "Research list formatting",
+      "budget": 220,
+      "urgency": "medium",
+      "businessFit": "low",
+      "source": "Demo CSV",
+      "consentToContact": false
+    }
+  ]
+}

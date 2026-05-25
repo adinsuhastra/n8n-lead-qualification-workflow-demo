@@ -1,0 +1,47 @@
+{
+  "demo": "n8n Lead Qualification Workflow Demo",
+  "generated_locally": true,
+  "contains_real_personal_data": false,
+  "results": [
+    {
+      "leadId": "DEMO-001",
+      "company": "Northstar Studio",
+      "score": 100,
+      "category": "Hot",
+      "validationStatus": "complete",
+      "recommendedNextAction": "Human review, then consider sending the follow-up draft.",
+      "approvalStatus": "waiting_for_human_review",
+      "followUpDraft": "Hi Maya, thanks for sharing the request for Northstar Studio. Based on the details, a good first step would be a short review of the current landing page and lead form routing workflow. I can start with a small scoped review and send a clear implementation plan before anything is changed."
+    },
+    {
+      "leadId": "DEMO-002",
+      "company": "Cedar Books",
+      "score": 68,
+      "category": "Warm",
+      "validationStatus": "complete",
+      "recommendedNextAction": "Review scope and budget before follow-up.",
+      "approvalStatus": "waiting_for_human_review",
+      "followUpDraft": "Hi Rafi, thanks for sharing the supplier list formatting request for Cedar Books. I can help review the spreadsheet structure and suggest a clean organization approach. I would start with a small sample so you can check the format first."
+    },
+    {
+      "leadId": "DEMO-003",
+      "company": "Blue Harbor Cafe",
+      "score": 0,
+      "category": "Needs Review",
+      "validationStatus": "missing email",
+      "recommendedNextAction": "Do not contact. Request complete details first.",
+      "approvalStatus": "blocked_until_review",
+      "followUpDraft": ""
+    },
+    {
+      "leadId": "DEMO-004",
+      "company": "Green Desk Admin",
+      "score": 0,
+      "category": "Needs Review",
+      "validationStatus": "no contact consent",
+      "recommendedNextAction": "Do not contact. Consent is required before outreach.",
+      "approvalStatus": "blocked_until_review",
+      "followUpDraft": ""
+    }
+  ]
+}
